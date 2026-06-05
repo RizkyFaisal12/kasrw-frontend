@@ -1,134 +1,276 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aplikasi Pencatatan Kas RW (AWS Server)</title>
-    <style>
-        body { font-family: 'Segoe UI', sans-serif; margin: 0; padding: 30px; background: #f8f9fa; color: #333; display: flex; flex-direction: column; align-items: center; }
-        .container { width: 100%; max-width: 700px; }
-        .card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 25px; }
-        form { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .full-width { grid-column: span 2; }
-        label { font-weight: 600; margin-bottom: 5px; font-size: 0.9rem; }
-        input, select { padding: 10px; border: 1px solid #ced4da; border-radius: 6px; font-size: 1rem; }
-        button { grid-column: span 2; background: #28a745; color: white; padding: 12px; border: none; border-radius: 6px; font-size: 1rem; font-weight: bold; cursor: pointer; margin-top: 10px; }
-        button:hover { background: #218838; }
-        table { width: 100%; border-collapse: collapse; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #eceff1; }
-        th { background: #007bff; color: white; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistem Manajemen Kas RW Sukapura</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <div class="container">
-        <h1 style="text-align: center;">Aplikasi Pencatatan Kas RW</h1>
-        
-        <div class="card">
-            <h3>Tambah Transaksi Baru (AWS)</h3>
-            <form id="transaksiForm">
-                <div style="display: flex; flex-direction: column;">
-                    <label>Tanggal</label>
-                    <input type="date" id="tanggal" required>
-                </div>
-                <div style="display: flex; flex-direction: column;">
-                    <label>Jenis</label>
-                    <select id="jenis" required>
-                        <option value="pemasukan">Pemasukan</option>
-                        <option value="pengeluaran">Pengeluaran</option>
-                    </select>
-                </div>
-                <div class="full-width" style="display: flex; flex-direction: column;">
-                    <label>Keterangan</label>
-                    <input type="text" id="keterangan" placeholder="Contoh: Iuran Warga" required>
-                </div>
-                <div class="full-width" style="display: flex; flex-direction: column;">
-                    <label>Jumlah Nominal (Rp)</label>
-                    <input type="number" id="jumlah" placeholder="Angka saja" required>
-                </div>
-                <button type="submit">Simpan Transaksi</button>
-            </form>
-        </div>
+  <div class="sidebar-overlay" id="overlay"></div>
 
-        <h3>Riwayat Kas</h3>
-        <table>
-            <thead>
-                <tr>
+  <div class="app-container">
+    
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-icon"><i class="fa-solid fa-vault"></i></div>
+        <div class="brand-text">
+          <h1>KasRW Digital</h1>
+          <p>Sukapura Hub</p>
+        </div>
+        <button class="sidebar-close" id="sidebarClose"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <nav class="sidebar-menu">
+        <a href="#" class="nav-item active" data-page="dashboard">
+          <i class="fa-solid fa-chart-pie nav-icon"></i><span>Dashboard</span>
+        </a>
+        <a href="#" class="nav-item" data-page="transaksi">
+          <i class="fa-solid fa-list-check nav-icon"></i><span>Manajemen Kas</span>
+        </a>
+        <a href="#" class="nav-item" data-page="tambah">
+          <i class="fa-solid fa-square-plus nav-icon"></i><span>Catat Transaksi</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-profile">
+          <div class="user-avatar"><i class="fa-solid fa-user-shield"></i></div>
+          <div class="user-info">
+            <span class="user-name">Chandra Hafidz</span>
+            <span class="user-role">Administrator</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <div class="content-wrapper">
+      
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="menu-toggle" id="menuToggle"><i class="fa-solid fa-bars"></i></button>
+          <h2 class="page-title" id="pageTitle">Dashboard</h2>
+        </div>
+        <div class="topbar-right">
+          <div class="connection-status" id="connStatus">
+            <span class="dot dot--checking"></span><span>Connecting...</span>
+          </div>
+        </div>
+      </header>
+
+      <main class="main-content">
+        
+        <!-- PAGE: DASHBOARD -->
+        <div class="page active" id="page-dashboard">
+          <div class="stats-grid">
+            <div class="stat-card card--balance">
+              <div class="stat-card-body">
+                <span class="stat-label">Total Saldo Kas Saat Ini</span>
+                <h3 class="stat-value" id="cardSaldo">Rp 0</h3>
+              </div>
+              <div class="stat-card-icon"><i class="fa-solid fa-wallet"></i></div>
+            </div>
+            <div class="stat-card card--income">
+              <div class="stat-card-body">
+                <span class="stat-label">Total Pemasukan</span>
+                <h3 class="stat-value text-success" id="cardMasuk">Rp 0</h3>
+              </div>
+              <div class="stat-card-icon"><i class="fa-solid fa-circle-arrow-down"></i></div>
+            </div>
+            <div class="stat-card card--expense">
+              <div class="stat-card-body">
+                <span class="stat-label">Total Pengeluaran</span>
+                <h3 class="stat-value text-danger" id="cardKeluar">Rp 0</h3>
+              </div>
+              <div class="stat-card-icon"><i class="fa-solid fa-circle-arrow-up"></i></div>
+            </div>
+            <!-- FIX: Tambah card jumlah transaksi agar cardJumlah tidak null -->
+            <div class="stat-card card--count">
+              <div class="stat-card-body">
+                <span class="stat-label">Jumlah Transaksi</span>
+                <h3 class="stat-value" id="cardJumlah">0 transaksi tercatat</h3>
+              </div>
+              <div class="stat-card-icon"><i class="fa-solid fa-receipt"></i></div>
+            </div>
+          </div>
+
+          <div class="section-card margin-top-lg">
+            <div class="section-header">
+              <h4 class="section-title"><i class="fa-solid fa-clock-rotate-left"></i> Riwayat Kas Terbaru</h4>
+              <button class="btn btn--text" onclick="gotoPage('transaksi')">Lihat Semua <i class="fa-solid fa-arrow-right"></i></button>
+            </div>
+            <div class="table-container">
+              <table class="table-custom">
+                <thead>
+                  <tr>
                     <th>Tanggal</th>
                     <th>Keterangan</th>
+                    <th>Kategori</th>
+                    <th>Admin</th>
                     <th>Jenis</th>
-                    <th>Jumlah</th>
-                </tr>
-            </thead>
-            <tbody id="transaksiTableBody"></tbody>
-        </table>
-    </div>
+                    <th class="text-right">Nominal</th>
+                  </tr>
+                </thead>
+                <tbody id="recentBody">
+                  <tr><td colspan="6" class="empty-cell">Memuat data log transaksi...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
 
-    <script>
-        // ALAMAT SUDAH DIKUNCI KE SERVER AWS LU LU PADA PORT 8000
-        const API_URL = "http://100.30.241.42:8000/transaksi";
+        <!-- PAGE: MANAJEMEN KAS -->
+        <div class="page" id="page-transaksi">
+          <div class="section-card">
+            <div class="filter-bar">
+              <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                <input type="text" id="searchInput" placeholder="Cari deskripsi atau kategori...">
+              </div>
+              <div class="filter-actions">
+                <select id="filterJenis" class="form-select">
+                  <option value="">Semua Jenis</option>
+                  <option value="pemasukan">Pemasukan (+)</option>
+                  <option value="pengeluaran">Pengeluaran (-)</option>
+                </select>
+                <button class="btn btn--primary" onclick="gotoPage('tambah'); resetForm();">
+                  <i class="fa-solid fa-plus"></i> Tambah Transaksi
+                </button>
+              </div>
+            </div>
 
-        document.getElementById('tanggal').valueAsDate = new Date();
+            <div class="table-container">
+              <table class="table-custom">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Tanggal</th>
+                    <th>Keterangan Transaksi</th>
+                    <th>Kategori</th>
+                    <th>Petugas</th>
+                    <th>Jenis</th>
+                    <th class="text-right">Nominal</th>
+                    <th class="text-center">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="mainBody">
+                  <tr><td colspan="8" class="empty-cell">Tidak ada log transaksi.</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="table-footer" id="tableFooter">Menampilkan 0 entri transaksi</div>
+          </div>
+        </div>
 
-        // Ambil Data dari AWS
-        async function fetchTransaksi() {
-            try {
-                const response = await fetch(API_URL);
-                if (!response.ok) return;
-                const data = await response.json();
-                const tbody = document.getElementById("transaksiTableBody");
-                tbody.innerHTML = "";
-                
-                if (data.length === 0) {
-                    tbody.innerHTML = "<tr><td colspan='4' style='text-align:center;'>Belum ada data di AWS</td></tr>";
-                    return;
-                }
-
-                data.forEach(t => {
-                    const warnaJumlah = t.jenis === 'pemasukan' ? '#28a745' : '#dc3545';
-                    tbody.innerHTML += `<tr>
-                        <td>${t.tanggal || '-'}</td>
-                        <td><b>${t.keterangan}</b></td>
-                        <td style="text-transform: capitalize;">${t.jenis}</td>
-                        <td style="color: ${warnaJumlah}; font-weight: bold;">Rp ${Number(t.jumlah).toLocaleString('id-ID')}</td>
-                    </tr>`;
-                });
-            } catch (error) {
-                console.error("Gagal memuat data dari AWS:", error);
-            }
-        }
-
-        // Simpan Data ke AWS
-        document.getElementById("transaksiForm").addEventListener("submit", async (e) => {
-            e.preventDefault();
+        <!-- PAGE: TAMBAH / EDIT TRANSAKSI -->
+        <div class="page" id="page-tambah">
+          <div class="form-card-container">
+            <div class="form-header">
+              <h3 id="formTitle">Tambah Transaksi Baru</h3>
+              <p id="formSubtitle">Isi data transaksi kas RW dengan lengkap</p>
+            </div>
             
-            const tanggal = document.getElementById("tanggal").value;
-            const keterangan = document.getElementById("keterangan").value;
-            const jenis = document.getElementById("jenis").value;
-            const jumlah = parseFloat(document.getElementById("jumlah").value);
+            <form id="transaksiForm">
+              <input type="hidden" id="editId" value="">
+              <input type="hidden" id="fieldJenis" value="pemasukan">
 
-            try {
-                const response = await fetch(API_URL, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ tanggal, keterangan, jenis, jumlah })
-                });
+              <div class="form-group">
+                <label class="form-label">Jenis Log Arus Kas <span class="required">*</span></label>
+                <div class="toggle-container" id="jenisToggle">
+                  <button type="button" class="toggle-btn active" data-val="pemasukan">Pemasukan (+)</button>
+                  <button type="button" class="toggle-btn" data-val="pengeluaran">Pengeluaran (-)</button>
+                </div>
+              </div>
 
-                if (response.ok) {
-                    alert("GOKIL! Data Berhasil Masuk ke MySQL AWS!");
-                    document.getElementById("transaksiForm").reset();
-                    document.getElementById('tanggal').valueAsDate = new Date();
-                    fetchTransaksi();
-                } else {
-                    const txt = await response.text();
-                    alert("AWS Menolak: " + txt);
-                }
-            } catch (error) {
-                alert("Gagal konek ke AWS! Pastikan Uvicorn di server AWS lu nyala dan Port 8000 udah di-open di Security Group AWS.");
-            }
-        });
+              <div class="form-grid-2">
+                <div class="form-group">
+                  <label for="fieldTanggal" class="form-label">Tanggal Transaksi <span class="required">*</span></label>
+                  <input type="date" id="fieldTanggal" class="form-control" required>
+                </div>
+                <div class="form-group">
+                  <label for="fieldKategori" class="form-label">Kategori <span class="required">*</span></label>
+                  <select id="fieldKategori" class="form-control" required>
+                    <option value="">-- Pilih Kategori --</option>
+                    <option value="Iuran Warga">Iuran Warga</option>
+                    <option value="Keamanan">Keamanan</option>
+                    <option value="Kebersihan">Kebersihan</option>
+                    <option value="Infrastruktur">Infrastruktur</option>
+                    <option value="Dana Sosial">Dana Sosial</option>
+                    <option value="Lain-lain">Lain-lain</option>
+                  </select>
+                </div>
+              </div>
 
-        fetchTransaksi();
-    </script>
+              <div class="form-grid-2">
+                <div class="form-group">
+                  <label for="fieldNominal" class="form-label">Nominal Rupiah (Rp) <span class="required">*</span></label>
+                  <input type="number" id="fieldNominal" class="form-control" placeholder="Contoh: 50000" min="1" required>
+                </div>
+                <div class="form-group">
+                  <label for="fieldAdmin" class="form-label">Petugas Pencatat <span class="required">*</span></label>
+                  <input type="text" id="fieldAdmin" class="form-control" value="Chandra H." placeholder="Nama admin" required>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="fieldKeterangan" class="form-label">Deskripsi / Keterangan <span class="required">*</span></label>
+                <textarea id="fieldKeterangan" class="form-control" placeholder="Tulis rincian transaksi disini..." rows="3" required></textarea>
+              </div>
+
+              <div class="form-actions-submit">
+                <button type="button" class="btn btn--outline" onclick="gotoPage('transaksi')">Batal</button>
+                <button type="submit" class="btn btn--primary" id="submitBtn">
+                  <i class="fa-solid fa-floppy-disk"></i> <span id="submitLabel">Simpan Transaksi</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- MODAL: DETAIL -->
+  <div class="modal-wrapper" id="detailModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-circle-info"></i> Rincian Nota Kas</h3>
+        <button class="modal-close" onclick="closeModal('detailModal')"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body" id="detailBody"></div>
+      <div class="modal-footer-btn">
+        <button class="btn btn--outline" onclick="closeModal('detailModal')">Tutup Jendela</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: DELETE CONFIRM -->
+  <div class="modal-wrapper" id="deleteModal">
+    <div class="modal-box modal-box--danger">
+      <div class="modal-header">
+        <h3>Konfirmasi Hapus Data</h3>
+        <button class="modal-close" onclick="closeModal('deleteModal')"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <div class="delete-alert-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+        <p>Apakah Anda yakin ingin menghapus data kas berikut secara permanen?</p>
+        <p class="delete-target-text" id="deleteDesc">"Loading..."</p>
+      </div>
+      <div class="modal-footer-btn">
+        <button class="btn btn--outline" onclick="closeModal('deleteModal')">Batal</button>
+        <button class="btn btn--danger" id="confirmDeleteBtn">Ya, Hapus Permanen</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script src="script.js"></script>
 </body>
 </html>
