@@ -3,142 +3,106 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aplikasi Pencatatan Kas RW</title>
+    <title>Aplikasi Pencatatan Kas RW (AWS Server)</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            background-color: #f4f4f9;
-        }
-        h1, h2 {
-            color: #333;
-        }
-        form {
-            background: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            max-width: 400px;
-            margin-bottom: 30px;
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-        input, select, button {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
-        }
-        button {
-            background-color: #28a745;
-            color: white;
-            font-size: 16px;
-            border: none;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-        button:hover {
-            background-color: #218838;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background: #fff;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            border-radius: 8px;
-            overflow: hidden;
-        }
-        th, td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-        }
-        th {
-            background-color: #007bff;
-            color: white;
-        }
-        tr:hover {
-            background-color: #f1f1f1;
-        }
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; padding: 30px; background: #f8f9fa; color: #333; display: flex; flex-direction: column; align-items: center; }
+        .container { width: 100%; max-width: 700px; }
+        .card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 25px; }
+        form { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .full-width { grid-column: span 2; }
+        label { font-weight: 600; margin-bottom: 5px; font-size: 0.9rem; }
+        input, select { padding: 10px; border: 1px solid #ced4da; border-radius: 6px; font-size: 1rem; }
+        button { grid-column: span 2; background: #28a745; color: white; padding: 12px; border: none; border-radius: 6px; font-size: 1rem; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        button:hover { background: #218838; }
+        table { width: 100%; border-collapse: collapse; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #eceff1; }
+        th { background: #007bff; color: white; }
     </style>
 </head>
 <body>
 
-    <h1>Aplikasi Pencatatan Kas RW</h1>
-
-    <h2>Tambah Transaksi</h2>
-    <form id="transaksiForm">
-        <div class="form-group">
-            <label for="keterangan">Keterangan:</label>
-            <input type="text" id="keterangan" required>
+    <div class="container">
+        <h1 style="text-align: center;">Aplikasi Pencatatan Kas RW</h1>
+        
+        <div class="card">
+            <h3>Tambah Transaksi Baru (AWS)</h3>
+            <form id="transaksiForm">
+                <div style="display: flex; flex-direction: column;">
+                    <label>Tanggal</label>
+                    <input type="date" id="tanggal" required>
+                </div>
+                <div style="display: flex; flex-direction: column;">
+                    <label>Jenis</label>
+                    <select id="jenis" required>
+                        <option value="pemasukan">Pemasukan</option>
+                        <option value="pengeluaran">Pengeluaran</option>
+                    </select>
+                </div>
+                <div class="full-width" style="display: flex; flex-direction: column;">
+                    <label>Keterangan</label>
+                    <input type="text" id="keterangan" placeholder="Contoh: Iuran Warga" required>
+                </div>
+                <div class="full-width" style="display: flex; flex-direction: column;">
+                    <label>Jumlah Nominal (Rp)</label>
+                    <input type="number" id="jumlah" placeholder="Angka saja" required>
+                </div>
+                <button type="submit">Simpan Transaksi</button>
+            </form>
         </div>
 
-        <div class="form-group">
-            <label for="jenis">Jenis:</label>
-            <select id="jenis" required>
-                <option value="Pemasukan">Pemasukan</option>
-                <option value="Pengeluaran">Pengeluaran</option>
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label for="jumlah">Jumlah:</label>
-            <input type="number" id="jumlah" required>
-        </div>
-
-        <button type="submit">Simpan</button>
-    </form>
-
-    <h2>Daftar Transaksi</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>Tanggal</th>
-                <th>Keterangan</th>
-                <th>Jenis</th>
-                <th>Jumlah</th>
-            </tr>
-        </thead>
-        <tbody id="transaksiTableBody">
-            </tbody>
-    </table>
+        <h3>Riwayat Kas</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Tanggal</th>
+                    <th>Keterangan</th>
+                    <th>Jenis</th>
+                    <th>Jumlah</th>
+                </tr>
+            </thead>
+            <tbody id="transaksiTableBody"></tbody>
+        </table>
+    </div>
 
     <script>
-        const API_URL = "http://52.87.250.53:8000/transaksi";
+        // ALAMAT SUDAH DIKUNCI KE SERVER AWS LU LU PADA PORT 8000
+        const API_URL = "http://100.30.241.42:8000/transaksi";
 
-        // Fungsi Ambil Data (Get All)
+        document.getElementById('tanggal').valueAsDate = new Date();
+
+        // Ambil Data dari AWS
         async function fetchTransaksi() {
             try {
                 const response = await fetch(API_URL);
+                if (!response.ok) return;
                 const data = await response.json();
                 const tbody = document.getElementById("transaksiTableBody");
                 tbody.innerHTML = "";
+                
+                if (data.length === 0) {
+                    tbody.innerHTML = "<tr><td colspan='4' style='text-align:center;'>Belum ada data di AWS</td></tr>";
+                    return;
+                }
 
                 data.forEach(t => {
-                    const row = document.createElement("tr");
-                    row.innerHTML = `
+                    const warnaJumlah = t.jenis === 'pemasukan' ? '#28a745' : '#dc3545';
+                    tbody.innerHTML += `<tr>
                         <td>${t.tanggal || '-'}</td>
-                        <td>${t.keterangan}</td>
-                        <td>${t.jenis}</td>
-                        <td>Rp ${Number(t.jumlah).toLocaleString('id-ID')}</td>
-                    `;
-                    tbody.appendChild(row);
+                        <td><b>${t.keterangan}</b></td>
+                        <td style="text-transform: capitalize;">${t.jenis}</td>
+                        <td style="color: ${warnaJumlah}; font-weight: bold;">Rp ${Number(t.jumlah).toLocaleString('id-ID')}</td>
+                    </tr>`;
                 });
             } catch (error) {
-                console.error("Gagal mengambil data:", error);
+                console.error("Gagal memuat data dari AWS:", error);
             }
         }
 
-        // Fungsi Tambah Data (Create)
+        // Simpan Data ke AWS
         document.getElementById("transaksiForm").addEventListener("submit", async (e) => {
             e.preventDefault();
+            
+            const tanggal = document.getElementById("tanggal").value;
             const keterangan = document.getElementById("keterangan").value;
             const jenis = document.getElementById("jenis").value;
             const jumlah = parseFloat(document.getElementById("jumlah").value);
@@ -146,26 +110,25 @@
             try {
                 const response = await fetch(API_URL, {
                     method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({ keterangan, jenis, jumlah })
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ tanggal, keterangan, jenis, jumlah })
                 });
 
                 if (response.ok) {
+                    alert("GOKIL! Data Berhasil Masuk ke MySQL AWS!");
                     document.getElementById("transaksiForm").reset();
-                    fetchTransaksi(); // Refresh tabel setelah simpan
+                    document.getElementById('tanggal').valueAsDate = new Date();
+                    fetchTransaksi();
                 } else {
-                    alert("Gagal menyimpan transaksi!");
+                    const txt = await response.text();
+                    alert("AWS Menolak: " + txt);
                 }
             } catch (error) {
-                console.error("Error saat menyimpan:", error);
+                alert("Gagal konek ke AWS! Pastikan Uvicorn di server AWS lu nyala dan Port 8000 udah di-open di Security Group AWS.");
             }
         });
 
-        // Load data pertama kali halaman dibuka
         fetchTransaksi();
     </script>
-
 </body>
 </html>
